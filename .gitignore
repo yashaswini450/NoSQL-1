@@ -1,0 +1,10 @@
+# Ignore massive generated database files
+*.tbl
+
+# Ignore compiled C binaries and object files
+*.o
+ps1/tpch-kit/dbgen/dbgen
+ps1/tpch-kit/dbgen/qgen
+
+# Ignore OS files
+.DS_Store
