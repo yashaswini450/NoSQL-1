@@ -8,3 +8,8 @@ ps1/tpch-kit/dbgen/qgen
 
 # Ignore OS files
 .DS_Store
+
+# Ignore Python caches and virtualenvs
+__pycache__/
+*.pyc
+ps1/.venv/
