@@ -256,40 +256,5 @@ linear scaling, ~42 s for 1 GB, and every intermediate value inspectable.
 The database wins as data volume, query complexity (joins), concurrency, or
 repeated querying grows — it pays once, at load time, for what the shell
 pays on every run.
-
-## Viva notes — details worth being able to explain
-
-1. **ISO-8601 trick**: `date >= '2026-01-01'` is implemented as an awk
-   *string* comparison. Fixed-width `YYYY-MM-DD` sorts lexicographically =
-   chronologically, so no date parsing is needed — but this is only valid
-   *after* the format has been validated, which is why validation runs
-   first.
-2. **`sort -t $'\t'`**: category values contain spaces (`Pet Supplies`);
-   with sort's default blank-separated fields the revenue column would
-   shift position for such rows.
-3. **`printf` vs `print` in awk**: `print number` goes through
-   `CONVFMT="%.6g"` → six significant digits → silent corruption of
-   revenues ≥ 10⁶. All numeric emissions use explicit `printf` formats.
-4. **`%.4f` between stages, `%.2f` at the end**: the intermediate
-   accumulator keeps 4 decimals so a group whose true revenue is e.g.
-   100 000.004 is correctly *kept* by HAVING (raw value > 100 000) even
-   though its displayed 2-decimal revenue rounds to 100 000.00.
-5. **`LC_ALL=C`**: byte-oriented collation → deterministic sort order and
-   noticeably faster sorting/regex on large inputs.
-6. **No `set -o pipefail`**: `sort | head` can close the pipe early (head
-   exits after 10 lines); under pipefail sort's resulting SIGPIPE would
-   fail the script spuriously. Realistic failure modes are caught by
-   fail-fast checks (missing input, bad header, unwritable log) instead.
-7. **Associative array = GROUP BY**: the array holds one counter + one
-   floating accumulator per distinct category — tens of bytes per group.
-   This is why peak memory is independent of input size (up to ~20 groups
-   here). The same would not hold for a high-cardinality grouping key.
-8. **Header printed after `head`**: the column header is added by the last
-   stage, so `head -n 10` can only ever count data rows.
-9. **mawk-portable regexes**: the validation EREs avoid `{n}` interval
-   repetition (`[0-9][0-9][0-9][0-9]` instead of `[0-9]{4}`), so the script
-   also runs under mawk/busybox awk, not just gawk.
-10. **CRLF and BOM tolerance**: a trailing `\r` is stripped per line (only
-    when actually present — checked with `substr`, cheaper than a regex)
-    and a UTF-8 BOM on the header is stripped once, so Windows-produced
+uced
     files behave identically.
