@@ -2,8 +2,8 @@
 
 ## Aim
 
-The aim is to compare every row in `customer incoming.csv` with the records in
-`customer master.csv`. Each incoming row is placed in exactly one of these five
+The aim is to compare every row in `customer_incoming.csv` with the records in
+`customer_master.csv`. Each incoming row is placed in exactly one of these five
 groups: complete match, partial match, incomplete match, no match/new entity, or
 conflicting information.
 
@@ -15,7 +15,7 @@ others:
 1. **Customer ID:** If it is present and occurs once in the master file, it is
    the strongest match.
 2. **Email or phone:** If either value identifies exactly one master row, that
-   row is selected. Spaces, letter case, and phone punctuation are ignored.
+   row is selected. Extra spaces, letter case, and phone punctuation are ignored.
 3. **Name with city or address:** A name by itself may not be unique, so it is
    accepted only when the same row also has the same city or address.
 4. If different details point to different master rows, the record is called an
@@ -45,13 +45,21 @@ names/addresses do not create false conflicts.
 
 Keep the Python file and the two supplied CSV files in the same folder. Run:
 
+<<<<<<< HEAD
 ```bash
+=======
+```text
+>>>>>>> 951694f (Align Question 2 report with implementation)
 python customer_matching.py customer_master.csv customer_incoming.csv
 ```
 
 To select a different output folder, add it as the third argument:
 
+<<<<<<< HEAD
 ```bash
+=======
+```text
+>>>>>>> 951694f (Align Question 2 report with implementation)
 python customer_matching.py customer_master.csv customer_incoming.csv results
 ```
 
@@ -64,7 +72,8 @@ The program automatically processes every incoming record and creates:
 
 - `record_classification.csv`: easy-to-read classification of every row.
 - `all_classified_records.json`: complete details for every incoming row.
-- `special_records.json`: rows with missing, irregular, or conflicting details.
+- `special_records.json`: incomplete rows and rows with missing, irregular, or
+  conflicting details.
 - `summary_statistics.json`: the count in each of the five categories.
 
 ## Results from the supplied files
@@ -106,9 +115,14 @@ databases.
 - Differences in case, spaces, or phone punctuation do not change identity.
 - A matching ID is used to associate a row even if another value conflicts. The
   conflict is then reported instead of ignoring the record.
-- Empty cells represent missing information.
+- Empty cells and markers such as `NA`, `N/A`, `null`, `none`, `unknown`, and
+  `-` represent missing information.
 
 ## Limitations and difficulties
+
+The main difficulties were matching records with missing customer IDs, handling
+repeated names, cleaning extra spaces and punctuation, and deciding whether a
+record had too little information or represented a new customer.
 
 - Two different people can share a name, city, address, or even a phone number.
 - The program does not perform advanced fuzzy spelling correction. For example,
