@@ -45,14 +45,14 @@ names/addresses do not create false conflicts.
 
 Keep the Python file and the two supplied CSV files in the same folder. Run:
 
-```text
-python question2_customer_matching.py customer_master.csv customer_incoming.csv
+```bash
+python customer_matching.py customer_master.csv customer_incoming.csv
 ```
 
 To select a different output folder, add it as the third argument:
 
-```text
-python question2_customer_matching.py customer_master.csv customer_incoming.csv results
+```bash
+python customer_matching.py customer_master.csv customer_incoming.csv results
 ```
 
 The program uses only built-in Python modules, so no package installation is
