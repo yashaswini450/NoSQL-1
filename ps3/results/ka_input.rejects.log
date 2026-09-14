@@ -1,0 +1,27 @@
+# reject log - input: results/ka_input.tsv
+# line_no	reason	row
+8	bad_date	T000000000007	2023-02-29	Garden	3	100
+9	bad_date	T000000000008	2026-13-01	Garden	3	100
+10	bad_date	T000000000009	2026-04-31	Garden	3	100
+11	bad_date	T000000000010	2026-4-05	Garden	3	100
+12	bad_quantity	T000000000011	2026-01-05	Garden	-3	100
+13	bad_quantity	T000000000012	2026-01-05	Garden	3.0	100
+14	bad_quantity	T000000000013	2026-01-05	Garden	 3	100
+15	bad_price	T000000000014	2026-01-05	Garden	3	10.
+16	bad_price	T000000000015	2026-01-05	Garden	3	1e3
+17	bad_price	T000000000016	2026-01-05	Garden	3	-5
+18	bad_price	T000000000017	2026-01-05	Garden	3	
+19	missing_field	T000000000018	2026-01-05	Garden	3
+20	extra_field	T000000000019	2026-01-05	Garden	3	100	EXTRA
+21	empty_line	
+# ---- summary ----
+input_data_rows	25
+rejected_total	14
+rejected_bad_price	4
+rejected_empty_line	1
+rejected_missing_field	1
+rejected_bad_quantity	3
+rejected_extra_field	1
+rejected_bad_date	4
+where_filtered	3
+passed_where	8

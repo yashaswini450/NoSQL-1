@@ -1,0 +1,5 @@
+category	transactions	revenue
+Outdoor	1	2999999.97
+Books	3	250030.00
+Jewelry	2	200000.50
+Office	1	100000.02

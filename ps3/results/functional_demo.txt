@@ -1,0 +1,122 @@
+=== A1: known-answer input (25 rows; results/ka_input.tsv) ===
+transaction_id	date	category	quantity	price
+T000000000001	2026-01-01	Jewelry	3	33333.50
+T000000000002	2026-01-01	Books	4	25000
+T000000000003	2026-01-02	Jewelry	5	20000.0008
+T000000000004	2025-12-31	Books	9	9999
+T000000000005	2026-01-01	Books	3	10
+T000000000006	2024-02-29	Garden	3	100
+T000000000007	2023-02-29	Garden	3	100
+T000000000008	2026-13-01	Garden	3	100
+T000000000009	2026-04-31	Garden	3	100
+T000000000010	2026-4-05	Garden	3	100
+T000000000011	2026-01-05	Garden	-3	100
+T000000000012	2026-01-05	Garden	3.0	100
+T000000000013	2026-01-05	Garden	 3	100
+T000000000014	2026-01-05	Garden	3	10.
+T000000000015	2026-01-05	Garden	3	1e3
+T000000000016	2026-01-05	Garden	3	-5
+T000000000017	2026-01-05	Garden	3	
+T000000000018	2026-01-05	Garden	3
+T000000000019	2026-01-05	Garden	3	100	EXTRA
+
+T000000000020	2026-01-05	Books	2	50000
+T000000000021	2026-01-05	Books	3	50000
+T000000000022	2026-01-05		3	100
+T000000000023	2026-01-05	Outdoor	3	999999.99
+T000000000024	2026-01-05	Office	3	33333.34
+
+=== A1: pipeline output ===
+category	transactions	revenue
+Outdoor	1	2999999.97
+Books	3	250030.00
+Jewelry	2	200000.50
+Office	1	100000.02
+
+=== A1: reject log ===
+# reject log - input: results/ka_input.tsv
+# line_no	reason	row
+8	bad_date	T000000000007	2023-02-29	Garden	3	100
+9	bad_date	T000000000008	2026-13-01	Garden	3	100
+10	bad_date	T000000000009	2026-04-31	Garden	3	100
+11	bad_date	T000000000010	2026-4-05	Garden	3	100
+12	bad_quantity	T000000000011	2026-01-05	Garden	-3	100
+13	bad_quantity	T000000000012	2026-01-05	Garden	3.0	100
+14	bad_quantity	T000000000013	2026-01-05	Garden	 3	100
+15	bad_price	T000000000014	2026-01-05	Garden	3	10.
+16	bad_price	T000000000015	2026-01-05	Garden	3	1e3
+17	bad_price	T000000000016	2026-01-05	Garden	3	-5
+18	bad_price	T000000000017	2026-01-05	Garden	3	
+19	missing_field	T000000000018	2026-01-05	Garden	3
+20	extra_field	T000000000019	2026-01-05	Garden	3	100	EXTRA
+21	empty_line	
+# ---- summary ----
+input_data_rows	25
+rejected_total	14
+rejected_bad_price	4
+rejected_empty_line	1
+rejected_missing_field	1
+rejected_bad_quantity	3
+rejected_extra_field	1
+rejected_bad_date	4
+where_filtered	3
+passed_where	8
+
+=== A1: known-answer check results ===
+known-answer check (ka output table): PASS
+known-answer check (ka rejected count): PASS
+known-answer check (ka rows filtered by WHERE): PASS
+known-answer check (ka rows passing WHERE): PASS
+
+=== A2: first 3 lines of the generated valid file ===
+transaction_id	date	category	quantity	price
+T000000000001	2025-10-09	Electronics	8	596.87
+T000000000002	2026-07-13	Stationery	3	118.51
+
+=== A2: pipeline output ===
+category	transactions	revenue
+Electronics	3755	55160982.98
+Furniture	1835	53051592.97
+Appliances	1431	29072271.96
+Home	3341	28572292.99
+Jewelry	835	24286374.52
+Automotive	1364	24044137.77
+Outdoor	1409	19905046.63
+Office	1895	16033434.29
+Sports	2368	16019638.55
+Clothing	3366	15794681.09
+
+=== A3: first 3 lines of the generated malformed file ===
+transaction_id	date	category	quantity	price
+T000000000001	2025-10-09	Electronics	8	596.87
+T000000000002	2026-07-13	Stationery	3	118.51
+
+=== A3: pipeline output ===
+category	transactions	revenue
+Electronics	3700	54360718.05
+Furniture	1819	52933496.48
+Appliances	1407	28629516.79
+Home	3280	28285862.54
+Jewelry	824	23764733.16
+Automotive	1349	23755931.00
+Outdoor	1424	20034417.15
+Sports	2321	15890778.33
+Clothing	3341	15702306.28
+Office	1862	15671658.51
+
+=== A3: reject log summary ===
+# ---- summary ----
+input_data_rows	100000
+rejected_total	1087
+rejected_bad_price	224
+rejected_missing_field	207
+rejected_bad_quantity	218
+rejected_bad_date	215
+rejected_extra_field	223
+where_filtered	54525
+passed_where	44388
+
+=== A3: first 3 rejected rows ===
+26	missing_field	T000000000025	2026-05-28	Automotive	17
+48	bad_quantity	T000000000047	2025-09-29	Pet Supplies	INVALID	463.48
+96	bad_price	T000000000095	2026-03-12	Home	17	N/A

@@ -1,0 +1,184 @@
+#!/usr/bin/env python3
+"""
+generate_transactions
+
+Generate synthetic transaction records for the Unix Data-Processing Pipeline
+assignment.
+
+Usage:
+    ./generate_transactions --records 1000000 --seed 42 > transactions_1M.tsv
+
+Optional:
+    ./generate_transactions --records 100000 --seed 42 --malformed > transactions_malformed.tsv
+
+Output schema:
+    transaction_id    date    category    quantity    price
+
+Fields are separated by TAB characters.
+"""
+
+import argparse
+import random
+import sys
+from datetime import date, timedelta
+
+CATEGORIES = [
+    "Electronics",
+    "Grocery",
+    "Clothing",
+    "Home",
+    "Sports",
+    "Books",
+    "Beauty",
+    "Toys",
+    "Automotive",
+    "Garden",
+    "Furniture",
+    "Stationery",
+    "Pet Supplies",
+    "Footwear",
+    "Health",
+    "Jewelry",
+    "Appliances",
+    "Music",
+    "Office",
+    "Outdoor",
+]
+
+# Different price ranges make the aggregation less artificial.
+PRICE_RANGES = {
+    "Electronics": (50, 2500),
+    "Grocery": (2, 250),
+    "Clothing": (10, 800),
+    "Home": (10, 1500),
+    "Sports": (10, 1200),
+    "Books": (5, 150),
+    "Beauty": (5, 500),
+    "Toys": (5, 600),
+    "Automotive": (20, 3000),
+    "Garden": (5, 1000),
+    "Furniture": (50, 5000),
+    "Stationery": (1, 200),
+    "Pet Supplies": (3, 500),
+    "Footwear": (15, 1000),
+    "Health": (3, 800),
+    "Jewelry": (20, 5000),
+    "Appliances": (30, 3500),
+    "Music": (5, 1500),
+    "Office": (5, 1500),
+    "Outdoor": (10, 2500),
+}
+
+# Weighted categories create realistic differences in group sizes.
+CATEGORY_WEIGHTS = [
+    8, 12, 7, 7, 5, 5, 5, 5, 3, 3,
+    4, 4, 4, 5, 4, 2, 3, 2, 4, 3
+]
+
+START_DATE = date(2025, 1, 1)
+END_DATE = date(2026, 12, 31)
+DATE_RANGE_DAYS = (END_DATE - START_DATE).days
+
+
+def random_date(rng):
+    return START_DATE + timedelta(days=rng.randint(0, DATE_RANGE_DAYS))
+
+
+def random_price(rng, category):
+    low, high = PRICE_RANGES[category]
+    # Generate a decimal price with two decimal places.
+    return f"{rng.uniform(low, high):.2f}"
+
+
+def generate_record(record_no, rng):
+    category = rng.choices(CATEGORIES, weights=CATEGORY_WEIGHTS, k=1)[0]
+    transaction_date = random_date(rng)
+    quantity = rng.randint(1, 20)
+    price = random_price(rng, category)
+
+    return (
+        f"T{record_no:012d}\t"
+        f"{transaction_date.isoformat()}\t"
+        f"{category}\t"
+        f"{quantity}\t"
+        f"{price}"
+    )
+
+
+def generate_malformed_record(record_no, rng):
+    """Create deliberately malformed records for testing."""
+    category = rng.choice(CATEGORIES)
+    valid_date = random_date(rng).isoformat()
+    price = random_price(rng, category)
+    quantity = rng.randint(1, 20)
+
+    kind = rng.choice([
+        "missing_field",
+        "bad_date",
+        "bad_quantity",
+        "bad_price",
+        "extra_field",
+    ])
+
+    if kind == "missing_field":
+        # Missing price.
+        return f"T{record_no:012d}\t{valid_date}\t{category}\t{quantity}"
+
+    if kind == "bad_date":
+        return f"T{record_no:012d}\t2026-99-99\t{category}\t{quantity}\t{price}"
+
+    if kind == "bad_quantity":
+        return f"T{record_no:012d}\t{valid_date}\t{category}\tINVALID\t{price}"
+
+    if kind == "bad_price":
+        return f"T{record_no:012d}\t{valid_date}\t{category}\t{quantity}\tN/A"
+
+    # Extra field.
+    return (
+        f"T{record_no:012d}\t{valid_date}\t{category}\t"
+        f"{quantity}\t{price}\tEXTRA"
+    )
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Generate synthetic TSV transaction data."
+    )
+    parser.add_argument(
+        "--records",
+        type=int,
+        required=True,
+        help="Number of records to generate."
+    )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=42,
+        help="Random seed (default: 42)."
+    )
+    parser.add_argument(
+        "--malformed",
+        action="store_true",
+        help="Inject approximately 1%% malformed records."
+    )
+    args = parser.parse_args()
+
+    if args.records < 1:
+        parser.error("--records must be at least 1")
+
+    rng = random.Random(args.seed)
+
+    # Header
+    print("transaction_id\tdate\tcategory\tquantity\tprice")
+
+    malformed_probability = 0.01 if args.malformed else 0.0
+
+    for i in range(1, args.records + 1):
+        if rng.random() < malformed_probability:
+            print(generate_malformed_record(i, rng))
+        else:
+            print(generate_record(i, rng))
+
+
+if __name__ == "__main__":
+    main()
