@@ -26,7 +26,7 @@ others:
 
 After selecting a master row, all values present in both records are compared.
 Phone punctuation, extra spaces, capitalization, and simple punctuation in
-names/addresses do not create false conflicts.
+names and addresses do not create false conflicts.
 
 ## Classification rules
 
@@ -45,21 +45,13 @@ names/addresses do not create false conflicts.
 
 Keep the Python file and the two supplied CSV files in the same folder. Run:
 
-<<<<<<< HEAD
 ```bash
-=======
-```text
->>>>>>> 951694f (Align Question 2 report with implementation)
 python customer_matching.py customer_master.csv customer_incoming.csv
 ```
 
-To select a different output folder, add it as the third argument:
+To save the output in the `results` folder, run:
 
-<<<<<<< HEAD
 ```bash
-=======
-```text
->>>>>>> 951694f (Align Question 2 report with implementation)
 python customer_matching.py customer_master.csv customer_incoming.csv results
 ```
 
@@ -70,7 +62,7 @@ needed.
 
 The program automatically processes every incoming record and creates:
 
-- `record_classification.csv`: easy-to-read classification of every row.
+- `record_classification.csv`: classification of every incoming row.
 - `all_classified_records.json`: complete details for every incoming row.
 - `special_records.json`: incomplete rows and rows with missing, irregular, or
   conflicting details.
@@ -90,52 +82,67 @@ records. The program produced the following results:
 | Conflicting information | 350 |
 | **Total** | **2,000** |
 
-The program also generated 1,200 JSON documents for records that were
-incomplete or contained missing, irregular, or conflicting information. No
-invalid email or phone formats were detected in the supplied incoming file.
+The program generated 1,200 JSON documents for records that were incomplete or
+contained missing, irregular, or conflicting information. No invalid email or
+phone formats were detected in the supplied incoming file.
 
-The JSON records contain available information, missing fields, irregular
-information, conflicts, match status, matched customer ID, and the reason for
-the decision.
+Each JSON record contains the available information, missing fields, irregular
+information, conflicts, match status, matched customer ID, and reason for the
+decision.
 
 ## Why JSON is suitable
 
 JSON is useful because incomplete records do not always contain the same fields.
 One customer may be missing an email, while another may have a conflicting phone
 number. JSON can store these different structures without forcing every record
-to have exactly the same values. Lists can hold missing field names, and nested
-objects can keep both the incoming and master values when there is a conflict.
-It is also readable and supported by most programming languages and NoSQL
-databases.
+to contain the same values.
+
+Lists can store missing field names. Nested objects can store both the incoming
+and master values when there is a conflict. JSON is also readable and supported
+by most programming languages and NoSQL databases.
 
 ## Assumptions
 
 - The first row of both CSV files contains column headings.
 - IDs, emails, and phone numbers should normally identify one customer.
+- A name alone is not enough for a reliable match.
 - Differences in case, spaces, or phone punctuation do not change identity.
 - A matching ID is used to associate a row even if another value conflicts. The
   conflict is then reported instead of ignoring the record.
 - Empty cells and markers such as `NA`, `N/A`, `null`, `none`, `unknown`, and
   `-` represent missing information.
+- Repeated incoming identifiers are processed separately because every incoming
+  row must be classified.
 
-## Limitations and difficulties
+## Difficulties encountered
 
-The main difficulties were matching records with missing customer IDs, handling
-repeated names, cleaning extra spaces and punctuation, and deciding whether a
-record had too little information or represented a new customer.
+The main difficulties were:
 
-- Two different people can share a name, city, address, or even a phone number.
+- Matching records with missing customer IDs.
+- Handling repeated names.
+- Cleaning extra spaces and punctuation.
+- Processing completely blank incoming records.
+- Deciding whether a record was incomplete or represented a new customer.
+- Handling cases where email and phone pointed to different master records.
+- Preserving missing and conflicting information in JSON.
+
+## Limitations
+
+- Different people may share the same name, city, address, or phone number.
 - The program does not perform advanced fuzzy spelling correction. For example,
   `John` and `Jon` are treated as different names.
 - Old or shared email addresses and phone numbers can cause incorrect matches.
-- The simple email and phone checks find obvious irregularities but do not prove
-  that an email address or phone number is real.
+- The email and phone checks validate only basic format. They cannot prove that
+  an email address or phone number is genuine.
 - Classification depends on the stated rules. A different justified matching
   strategy may produce slightly different results.
 
-## Evidence to include in the submission
+## Verification
 
-After running the program, submit the Python source file, both input CSV files,
-the four generated output files, and a screenshot or copied terminal output of
-the summary. The team should check a sample of each category and be ready to
-explain the matching rules during the demonstration.
+The solution was tested for complete matches, partial matches, conflicts,
+incomplete records, new customers, duplicate identifiers, duplicate names,
+invalid contact details, missing-value markers, Unicode names, extra CSV values,
+and duplicate column names.
+
+The final program processed all 2,000 incoming records successfully. Every
+record was classified exactly once, and an independent audit found no errors.
