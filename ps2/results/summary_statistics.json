@@ -1,0 +1,8 @@
+{
+    "partial_match": 657,
+    "incomplete_match": 193,
+    "complete_match": 400,
+    "no_match_new_entity": 400,
+    "conflicting_information": 350,
+    "total_incoming_records": 2000
+}
