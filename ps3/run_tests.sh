@@ -397,7 +397,7 @@ hr; echo "SECTION C - timing benchmark (best of $RUNS run(s) per size)"; hr
     echo
     echo "--- C2: full-pipeline timing per dataset ---"
     printf '%-10s %-12s %-24s %-9s %-12s\n' "Size(MB)" "Records" "Runs(s)" "Best(s)" "MB/s"
-    BEST_TIMES=()
+    BEST_TIMES=(); RUNS_ALL=()
     for i in "${!SIZE_MB[@]}"; do
         MB=${SIZE_MB[$i]}; BYTES=${SIZE_BYTES[$i]}; RECS=${SIZE_RECS[$i]}
         F="$DATA_DIR/transactions_${MB}MB.tsv"
@@ -410,6 +410,7 @@ hr; echo "SECTION C - timing benchmark (best of $RUNS run(s) per size)"; hr
         BEST_TIMES+=("$BEST")
         MBPS=$(awk -v b="$BYTES" -v t="$BEST" 'BEGIN { printf "%.1f", b / 1000000 / t }')
         RUNS_CELL=$(printf '%s / ' "${TIMES[@]}"); RUNS_CELL=${RUNS_CELL%/ }
+        RUNS_ALL+=("$RUNS_CELL")
         printf '%-10s %-12s %-24s %-9s %-12s\n' "$MB" "$RECS" "$RUNS_CELL" "$BEST" "$MBPS"
     done
 
@@ -443,11 +444,22 @@ hr; echo "SECTION C - timing benchmark (best of $RUNS run(s) per size)"; hr
         MBPS=$(awk -v b="${SIZE_BYTES[$i]}" -v t="${BEST_TIMES[$i]}" 'BEGIN { printf "%.1f", b / 1000000 / t }')
         printf '%-10s %-12s %-10s %-12s\n' "${SIZE_MB[$i]}" "${SIZE_RECS[$i]}" "${BEST_TIMES[$i]}" "$MBPS"
     done
+    echo
+    echo "--- C6: machine-readable results (results/scalability_results.csv) ---"
+    {
+        printf 'size_mb,records,input_bytes,runs_s,best_s,throughput_mb_s\n'
+        for i in "${!SIZE_MB[@]}"; do
+            printf '%s,%s,%s,"%s",%s,%s\n' "${SIZE_MB[$i]}" "${SIZE_RECS[$i]}" "${SIZE_BYTES[$i]}" \
+                "${RUNS_ALL[$i]}" "${BEST_TIMES[$i]}" \
+                "$(awk -v b="${SIZE_BYTES[$i]}" -v t="${BEST_TIMES[$i]}" 'BEGIN { printf "%.1f", b / 1000000 / t }')"
+        done
+    } > "$RESULTS_DIR/scalability_results.csv"
+    cat "$RESULTS_DIR/scalability_results.csv"
 } | tee "$RESULTS_DIR/benchmark_results.txt"
 
 echo
 printf 'datasets kept in : %s\n' "$DATA_DIR"
-printf 'results written  : %s/functional_demo.txt, %s/benchmark_results.txt (+ reject logs)\n' "$RESULTS_DIR" "$RESULTS_DIR"
+printf 'results written  : %s/functional_demo.txt, %s/benchmark_results.txt, %s/scalability_results.csv (+ reject logs)\n' "$RESULTS_DIR" "$RESULTS_DIR" "$RESULTS_DIR"
 printf 'to free the disk: ./run_tests.sh --clean  (deletes %s)\n' "$DATA_DIR"
 
 if [ "$KNOWN_ANSWER_FAILS" -gt 0 ]; then

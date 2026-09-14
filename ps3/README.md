@@ -12,7 +12,7 @@ loaded into memory: every stage consumes and produces lines through pipes.
 | `pipeline.sh` | the pipeline itself. `./pipeline.sh INPUT.tsv [REJECT_LOG]` |
 | `generate_transactions` | course-provided data generator, shipped here so the benchmark reproduces standalone (the driver also accepts `--generator PATH`) |
 | `run_tests.sh` | driver: functional demo + known-answer checks, dataset generation at target sizes, timing benchmark. `./run_tests.sh --help` |
-| `results/` | outputs written by the driver (`functional_demo.txt`, `benchmark_results.txt`, sample reject logs) |
+| `results/` | outputs written by the driver (`functional_demo.txt`, `benchmark_results.txt`, `scalability_results.csv`, sample reject logs) |
 
 ## The query
 
