@@ -33,7 +33,8 @@ if ! sudo -u postgres psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='${CURRENT
 fi
 
 echo "### 3. Building dbgen ###"
-(cd tpch-kit/dbgen && make)
+# Makefile is pre-patched with -std=gnu89 for GCC 14+ compatibility
+(cd tpch-kit/dbgen && make clean && make)
 
 echo "### 4. Setting up Python environment ###"
 python3 -m venv .venv
