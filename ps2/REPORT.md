@@ -112,7 +112,7 @@ databases.
 
 - Two different people can share a name, city, address, or even a phone number.
 - The program does not perform advanced fuzzy spelling correction. For example,
-  `Mohammed` and `Mohamad` are treated as different names.
+  `John` and `Jon` are treated as different names.
 - Old or shared email addresses and phone numbers can cause incorrect matches.
 - The simple email and phone checks find obvious irregularities but do not prove
   that an email address or phone number is real.
